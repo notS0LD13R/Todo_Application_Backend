@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS todos (
+    id      VARCHAR(69)  DEFAULT RANDOM_UUID() PRIMARY KEY,
+    value    VARCHAR      NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS users (
+    id VARCHAR(69) DEFAULT gen_random_uuid () PRIMARY KEY,
+    username VARCHAR(42) NOT NULL,
+    password VARCHAR(42) NOT NULL
+);
