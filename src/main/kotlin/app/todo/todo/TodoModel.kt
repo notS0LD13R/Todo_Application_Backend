@@ -7,3 +7,4 @@ import org.springframework.data.repository.CrudRepository
 @Table("todos")
 data class Todo(@Id var id: String?, val value: String)
 interface TodoRepository : CrudRepository<Todo, String>
+data class TodoResponse(val msg:String,val error:Boolean)

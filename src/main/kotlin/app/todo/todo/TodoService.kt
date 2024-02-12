@@ -1,10 +1,13 @@
 package app.todo.todo
 
+import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
 import kotlin.jvm.optionals.toList
 
 @Service
-class TodoService(val db: TodoRepository) {
+class TodoService(private val db: TodoRepository,private val producer:KafkaTemplate<String,Todo>) {
+
+    private val topic_name = "chat_messages"
     fun getTodos(): List<Todo> {
         val result = db.findAll().toList()
         return result
@@ -19,4 +22,15 @@ class TodoService(val db: TodoRepository) {
         val result = db.save(todo)
         println(result)
     }
+
+    fun produceTodo(todo:Todo):TodoResponse{
+        try{
+            producer.send(topic_name,todo)
+            return TodoResponse("event successfully streamed to ${topic_name}}",false)
+        }catch (e:Exception){
+            return TodoResponse(e.toString(),true)
+        }
+
+    }
+
 }

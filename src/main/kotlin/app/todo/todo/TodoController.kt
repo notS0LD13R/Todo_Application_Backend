@@ -20,4 +20,9 @@ class TodoController(val service: TodoService) {
             service.addTodo(todo)
         }
     }
+
+    @PostMapping("/kafka")
+    fun producer(@RequestBody message: Todo):TodoResponse{
+        return service.produceTodo(message)
+    }
 }
