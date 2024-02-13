@@ -2,6 +2,7 @@ package app.todo.security
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import com.auth0.jwt.interfaces.DecodedJWT
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.time.Duration
@@ -12,15 +13,17 @@ import java.time.temporal.ChronoUnit
 class JwtHandler {
 
     @Value("\${jwt.secret}")
-    private lateinit var secretKey:String
+    private lateinit var secretKey: String
 
-    fun generateToken(userId: String, roles: List<String>): String {
-
-        return JWT
-            .create()
-            .withSubject(userId)
-            .withClaim("roles",roles)
-            .withExpiresAt(Instant.now().plus(Duration.of(1,ChronoUnit.DAYS)))
-            .sign(Algorithm.HMAC256(secretKey))
+    fun generateToken(userId: String, username: String, roles: List<String>): String {
+        return JWT.create().withSubject(userId).withClaim("roles", roles).withClaim("username",username)
+            .withExpiresAt(Instant.now().plus(Duration.of(1, ChronoUnit.DAYS))).sign(Algorithm.HMAC256(secretKey))
     }
+
+    fun verifyToken(token: String): DecodedJWT {
+        return JWT.require(Algorithm.HMAC256(secretKey)).build().verify(token)
+    }
+
+
+
 }

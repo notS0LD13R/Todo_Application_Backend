@@ -12,14 +12,13 @@ class AuthController(
 ) {
 
     @Value("\${jwt.secret}")
-    private lateinit var secretKey:String
+    private lateinit var secretKey: String
 
     @PostMapping("/auth/login")
-    fun login(@RequestBody req:LoginRequest):LoginResponse{
+    fun login(@RequestBody req: LoginRequest): LoginResponse {
         val accessToken = jwtHandler.generateToken(
-            req.username,
-            listOf("user")
+            "", req.username, listOf("user")
         )
-        return LoginResponse("Success ${req.username} $secretKey",accessToken,"refresh 1")
+        return LoginResponse("Success Logged In", accessToken, "refresh 1")
     }
 }
