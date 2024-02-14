@@ -1,5 +1,8 @@
 package app.todo.security
 
+import app.todo.helper.JsonHandler
+import app.todo.helper.ResponseBody
+import com.auth0.jwt.exceptions.TokenExpiredException
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -9,10 +12,15 @@ import org.springframework.util.StringUtils
 import org.springframework.web.filter.OncePerRequestFilter
 
 @Component
-class JwtAuthenticationFilter(private val jwtHandler: JwtHandler, private val jwtToUserPrincipal: JwtToUserPrincipal) :
-    OncePerRequestFilter() {
+class JwtAuthenticationFilter(
+    private val jwtHandler: JwtHandler,
+    private val jwtToUserPrincipal: JwtToUserPrincipal,
+    private val jsonHandler: JsonHandler
+) : OncePerRequestFilter() {
     override fun doFilterInternal(
-        request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+        filterChain: FilterChain
     ) {
         try {
             val token = extractToken(request)
@@ -21,13 +29,23 @@ class JwtAuthenticationFilter(private val jwtHandler: JwtHandler, private val jw
                 user.let {
                     SecurityContextHolder.getContext().authentication =
                         UserAuthenticationToken(jwtToUserPrincipal.convert(user))
-
                 }
             }
-        } catch (e: Exception) {
-            print("Error:${e}")
+            filterChain.doFilter(request, response)
+        } catch (e: TokenExpiredException) {
+            response.addHeader("Content-Type","application/json")
+            response.writer.write(
+                jsonHandler.objectToJson(ResponseBody(true, "Token expired", e.javaClass))
+            )
+            response.flushBuffer()
+        }catch (e:Exception){
+            response.addHeader("Content-Type","application/json")
+            response.writer.write(
+                jsonHandler.objectToJson(ResponseBody(true, "Something went wrong", e.javaClass))
+            )
+            response.flushBuffer()
+
         }
-        filterChain.doFilter(request, response)
     }
 
     fun extractToken(request: HttpServletRequest): String? {

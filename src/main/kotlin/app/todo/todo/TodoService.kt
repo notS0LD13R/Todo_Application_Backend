@@ -24,12 +24,12 @@ class TodoService(private val db: TodoRepository,private val producer:KafkaTempl
     }
 
     fun produceTodo(todo:Todo):TodoResponse{
-        try{
+
             producer.send(topic_name,todo)
             return TodoResponse("event successfully streamed to ${topic_name}}",false)
-        }catch (e:Exception){
-            return TodoResponse(e.toString(),true)
-        }
+
+
+
 
     }
 

@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
@@ -15,7 +16,12 @@ class WebSecurityConfig(private val jwtAuthenticationFilter:JwtAuthenticationFil
     @Bean
     fun applicationSecurity(http:HttpSecurity):SecurityFilterChain{
 
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+        @Bean
+        fun passwordEncoder(): BCryptPasswordEncoder {
+            return BCryptPasswordEncoder();
+        }
+
+        http.addFilterAfter(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
 
         http
             .cors{it.disable()}
