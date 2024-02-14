@@ -6,6 +6,7 @@ import com.auth0.jwt.exceptions.TokenExpiredException
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.springframework.http.HttpStatus
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import org.springframework.util.StringUtils
@@ -34,12 +35,14 @@ class JwtAuthenticationFilter(
             filterChain.doFilter(request, response)
         } catch (e: TokenExpiredException) {
             response.addHeader("Content-Type","application/json")
+            response.status=HttpStatus.UNAUTHORIZED.value()
             response.writer.write(
                 jsonHandler.objectToJson(ResponseBody(true, "Token expired", e.javaClass))
             )
             response.flushBuffer()
         }catch (e:Exception){
             response.addHeader("Content-Type","application/json")
+            response.status=HttpStatus.INTERNAL_SERVER_ERROR.value()
             response.writer.write(
                 jsonHandler.objectToJson(ResponseBody(true, "Something went wrong", e.javaClass))
             )

@@ -27,7 +27,7 @@ class AuthController(
             "Successfully Logged In"
         )
         }catch (e:EmptyResultDataAccessException){
-            throw ResponseException("User does not exist or invalid credentials",e,400)
+            throw ResponseException("User does not exist",e,400)
         }
     }
 

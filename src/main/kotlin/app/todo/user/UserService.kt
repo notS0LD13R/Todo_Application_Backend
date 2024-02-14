@@ -18,11 +18,12 @@ class UserService(private val db: UserRepository, private val encoder: PasswordE
         return db.save(User(null, username, encoder.encode(password), listOf()))
     }
 
-    fun validateUser(username:String,password:String):User{
+    fun validateUser(username: String, password: String): User {
         try {
-
-        return db.verify(username,password)
-        }catch (e:Exception){
+            val user = db.getByUsername(username)
+            if (!encoder.isSame(password, user.password)) throw Exception("Invalid credentials")
+            return user
+        } catch (e: Exception) {
             print(e.toString())
             throw e
         }
