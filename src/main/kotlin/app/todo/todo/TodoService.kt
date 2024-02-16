@@ -7,7 +7,7 @@ import kotlin.jvm.optionals.toList
 @Service
 class TodoService(private val db: TodoRepository,private val producer:KafkaTemplate<String,Todo>) {
 
-    private val topic_name = "chat_messages"
+    private val topicName = "chat_messages"
     fun getTodos(): List<Todo> {
         val result = db.findAll().toList()
         return result
@@ -20,17 +20,12 @@ class TodoService(private val db: TodoRepository,private val producer:KafkaTempl
 
     fun addTodo(todo: Todo) {
         val result = db.save(todo)
-        println(result)
     }
 
     fun produceTodo(todo:Todo):TodoResponse{
-
-            producer.send(topic_name,todo)
-            return TodoResponse("event successfully streamed to ${topic_name}}",false)
-
-
-
-
+//            todo.id=todo.id?:""
+            producer.send(topicName,todo)
+            return TodoResponse("event successfully streamed to ${topicName}}",false)
     }
 
 }

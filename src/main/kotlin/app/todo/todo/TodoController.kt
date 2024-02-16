@@ -1,5 +1,6 @@
 package app.todo.todo
 
+import app.todo.exception.ResponseException
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -23,6 +24,10 @@ class TodoController(val service: TodoService) {
 
     @PostMapping("/kafka")
     fun producer(@RequestBody message: Todo):TodoResponse{
+        try{
         return service.produceTodo(message)
+        }catch (e:Exception){
+            throw ResponseException(e.message?:"Something went wrong",e)
+        }
     }
 }
