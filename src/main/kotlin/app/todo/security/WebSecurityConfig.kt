@@ -12,7 +12,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 class WebSecurityConfig(private val jwtAuthenticationFilter:JwtAuthenticationFilter) {
-
     @Bean
     fun applicationSecurity(http:HttpSecurity):SecurityFilterChain{
 
@@ -22,7 +21,6 @@ class WebSecurityConfig(private val jwtAuthenticationFilter:JwtAuthenticationFil
         }
 
         http.addFilterAfter(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
-
         http
             .cors{it.disable()}
             .csrf{it.disable()}
@@ -32,10 +30,8 @@ class WebSecurityConfig(private val jwtAuthenticationFilter:JwtAuthenticationFil
             .authorizeHttpRequests{
                 it
                     .requestMatchers("/auth/**").permitAll()
-                    .anyRequest().authenticated()
+                    .anyRequest().hasAuthority("ADMIN")
             }
-
-
         return http.build()
     }
 }

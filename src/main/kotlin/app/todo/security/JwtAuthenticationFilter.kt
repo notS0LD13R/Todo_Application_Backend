@@ -31,10 +31,10 @@ class JwtAuthenticationFilter(
             }
             val token = extractToken(request)
             if (!token.isNullOrBlank()) {
-                val user = jwtHandler.verifyToken(token)
-                user.let {
+                val jwt = jwtHandler.verifyToken(token)
+                jwt.let {
                     SecurityContextHolder.getContext().authentication =
-                        UserAuthenticationToken(jwtToUserPrincipal.convert(user))
+                        UserAuthenticationToken(jwtToUserPrincipal.convert(jwt))
                 }
             }
             filterChain.doFilter(request, response)

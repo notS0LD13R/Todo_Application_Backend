@@ -1,0 +1,17 @@
+spring:
+  kafka:
+    producer:
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      bootstrap-servers: localhost:29092
+    consumer:
+      auto-offset-reset: earliest
+      bootstrap-servers: localhost:29092
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  datasource:
+    username: postgres
+    url: jdbc:postgresql://localhost:5432/Todo
+    password: root
+jwt:
+  secret: 8786344b43bc7bfca6e676fc5c635602a2c1d7033f1ff86249713a8cb8f3d179
