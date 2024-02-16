@@ -23,7 +23,12 @@ class JwtAuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
+
         try {
+            if(isExemptedURL(request)){
+                filterChain.doFilter(request, response)
+                return
+            }
             val token = extractToken(request)
             if (!token.isNullOrBlank()) {
                 val user = jwtHandler.verifyToken(token)
@@ -51,6 +56,11 @@ class JwtAuthenticationFilter(
         }
     }
 
+    fun isExemptedURL(request:HttpServletRequest):Boolean{
+        val uri = request.requestURI
+        val pattern = "(/auth/)([\\w/]+)"
+        return Regex(pattern).matches(uri)
+    }
     fun extractToken(request: HttpServletRequest): String? {
         val token = request.getHeader("Authorization")
         if (StringUtils.hasText(token) && token.startsWith("Bearer ")) {
