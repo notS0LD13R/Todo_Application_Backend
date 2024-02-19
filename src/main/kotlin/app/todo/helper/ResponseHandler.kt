@@ -9,7 +9,7 @@ data class ResponseBody(val error: Boolean, val message: String, val response: A
 class ResponseHandler(private val jsonHandler: JsonHandler) {
     fun create(body: Any?, message: String, error:Boolean=false, status: Int=200): ResponseEntity<String> {
         return ResponseEntity.status(status).header("Content-Type","application/json").body(
-                jsonHandler.objectToJson(ResponseBody(error, message, body))
+                jsonHandler.stringify(ResponseBody(error, message, body))
             )
     }
 }

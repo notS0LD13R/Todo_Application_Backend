@@ -18,14 +18,15 @@ class JwtAuthenticationFilter(
     private val jwtToUserPrincipal: JwtToUserPrincipal,
     private val jsonHandler: JsonHandler
 ) : OncePerRequestFilter() {
+
+    private val exemptedPattern = arrayOf("(/auth/)([\\w/]+)")
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-
         try {
-            if(isExemptedURL(request)){
+            if (isExemptedURL(request)) {
                 filterChain.doFilter(request, response)
                 return
             }
@@ -39,32 +40,37 @@ class JwtAuthenticationFilter(
             }
             filterChain.doFilter(request, response)
         } catch (e: TokenExpiredException) {
-            response.addHeader("Content-Type","application/json")
-            response.status=HttpStatus.UNAUTHORIZED.value()
+            response.addHeader("Content-Type", "application/json")
+            response.status = HttpStatus.UNAUTHORIZED.value()
             response.writer.write(
-                jsonHandler.objectToJson(ResponseBody(true, "Token expired", e.javaClass))
+                jsonHandler.stringify(ResponseBody(true, "Token expired", e.javaClass))
             )
             response.flushBuffer()
-        }catch (e:Exception){
-            response.addHeader("Content-Type","application/json")
-            response.status=HttpStatus.INTERNAL_SERVER_ERROR.value()
+        } catch (e: Exception) {
+            response.addHeader("Content-Type", "application/json")
+            response.status = HttpStatus.INTERNAL_SERVER_ERROR.value()
             response.writer.write(
-                jsonHandler.objectToJson(ResponseBody(true, "Something went wrong", e.javaClass))
+                jsonHandler.stringify(
+                    ResponseBody(true, e.message ?: "Something went wrong", e.javaClass)
+                )
             )
             response.flushBuffer()
-
         }
     }
 
-    fun isExemptedURL(request:HttpServletRequest):Boolean{
+    fun isExemptedURL(request: HttpServletRequest): Boolean {
         val uri = request.requestURI
-        val pattern = "(/auth/)([\\w/]+)"
-        return Regex(pattern).matches(uri)
+        return exemptedPattern.any{Regex(it).matches(uri)}
     }
+
     fun extractToken(request: HttpServletRequest): String? {
-        val token = request.getHeader("Authorization")
-        if (StringUtils.hasText(token) && token.startsWith("Bearer ")) {
-            return token.substring(7)
+        try {
+            val token = request.getHeader("Authorization")
+            if (StringUtils.hasText(token) && token.startsWith("Bearer ")) {
+                return token.substring(7)
+            }
+        } catch (e: Exception) {
+            throw Exception("Error extracting token")
         }
         return null
     }

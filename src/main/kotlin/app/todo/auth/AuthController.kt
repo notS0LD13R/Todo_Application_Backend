@@ -28,6 +28,8 @@ class AuthController(
         )
         }catch (e:EmptyResultDataAccessException){
             throw ResponseException("User does not exist",e,400)
+        }catch(e:Exception){
+            throw ResponseException(e.message?:"User Authentication Failed",e,400)
         }
     }
 
