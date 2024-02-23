@@ -4,14 +4,15 @@ import app.todo.exception.ResponseException
 import org.springframework.web.bind.annotation.*
 
 @RestController
+@RequestMapping("/todo")
 class TodoController(val service: TodoService) {
     @GetMapping("/")
     fun index(): List<Todo> {
         return service.getTodos()
     }
 
-    @GetMapping("/{id}")
-    fun index(@PathVariable id: String): Todo {
+    @GetMapping("/", params = ["id"])
+    fun index(@RequestParam id: String): Todo {
         return service.getTodoById(id)
     }
 

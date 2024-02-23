@@ -1,11 +1,11 @@
 spring:
   kafka:
+    topics:
+      todo: chat_messages
     producer:
       value-serializer: app.todo.helper.TodoSerializer
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       bootstrap-servers: localhost:29092
-      topics:
-        chat-messages: chat_messages
     consumer:
       auto-offset-reset: earliest
       bootstrap-servers: localhost:29092

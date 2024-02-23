@@ -24,7 +24,7 @@ class UserService(private val db: UserRepository, private val encoder: PasswordE
             if (!encoder.isSame(password, user.password)) throw Exception("Invalid credentials")
             return user
         } catch (e: Exception) {
-            print(e.toString())
+
             throw e
         }
     }

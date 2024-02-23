@@ -9,8 +9,6 @@ class TodoSerializer : Serializer<Todo> {
     private val objectMapper = ObjectMapper()
 
     override fun serialize(topic: String?, data: Todo?): ByteArray {
-        println("$data $topic")
-//        if (data == null) throw SerializationException("Error serializing null Todo")
         try {
             return objectMapper.writeValueAsBytes(data)
         } catch (e: Exception) {

@@ -1,12 +1,9 @@
 package app.todo.security
 
 import app.todo.helper.JsonHandler
-import app.todo.helper.ResponseBody
-import com.auth0.jwt.exceptions.TokenExpiredException
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import org.springframework.http.HttpStatus
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import org.springframework.util.StringUtils
@@ -19,13 +16,15 @@ class JwtAuthenticationFilter(
     private val jsonHandler: JsonHandler
 ) : OncePerRequestFilter() {
 
+    private val socketURI = "/socket"
     private val exemptedPattern = arrayOf("(/auth/)([\\w/]+)")
+
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        try {
+//        try {
             if (isExemptedURL(request)) {
                 filterChain.doFilter(request, response)
                 return
@@ -39,28 +38,29 @@ class JwtAuthenticationFilter(
                 }
             }
             filterChain.doFilter(request, response)
-        } catch (e: TokenExpiredException) {
-            response.addHeader("Content-Type", "application/json")
-            response.status = HttpStatus.UNAUTHORIZED.value()
-            response.writer.write(
-                jsonHandler.stringify(ResponseBody(true, "Token expired", e.javaClass))
-            )
-            response.flushBuffer()
-        } catch (e: Exception) {
-            response.addHeader("Content-Type", "application/json")
-            response.status = HttpStatus.INTERNAL_SERVER_ERROR.value()
-            response.writer.write(
-                jsonHandler.stringify(
-                    ResponseBody(true, e.message ?: "Something went wrong", e.javaClass)
-                )
-            )
-            response.flushBuffer()
-        }
+//        } catch (e: TokenExpiredException) {
+//            response.addHeader("Content-Type", "application/json")
+//            response.status = HttpStatus.UNAUTHORIZED.value()
+//            response.writer.write(
+//                jsonHandler.stringify(ResponseBody(true, "Token expired", e.javaClass))
+//            )
+//            response.flushBuffer()
+//        } catch (e: Exception) {
+//            print(e)
+//            response.addHeader("Content-Type", "application/json")
+//            response.status = HttpStatus.INTERNAL_SERVER_ERROR.value()
+//            response.writer.write(
+//                jsonHandler.stringify(
+//                    ResponseBody(true, e.message ?: "Something went wrong", e.javaClass)
+//                )
+//            )
+//            response.flushBuffer()
+//        }
     }
 
     fun isExemptedURL(request: HttpServletRequest): Boolean {
         val uri = request.requestURI
-        return exemptedPattern.any{Regex(it).matches(uri)}
+        return exemptedPattern.any { Regex(it).matches(uri) }
     }
 
     fun extractToken(request: HttpServletRequest): String? {
